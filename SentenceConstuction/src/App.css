@@ -1,0 +1,7 @@
+@import "tailwindcss";
+
+/* App.css or a global file */
+:root {
+  
+  --color-avocado-500: rgba(69, 63, 225, 1);
+}
