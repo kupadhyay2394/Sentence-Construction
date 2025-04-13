@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
+import CircularScore from './Scoremeter';
 
 const questionData = {
     "status": "SUCCESS",
@@ -70,7 +71,7 @@ const questionData = {
           "correctAnswer": ["Gradual", "Improved", "Reducing", "Opening"]
         },
         {
-          "questionId": "d78effdf-88ab-4667-8115-3bfb2baa0a24",
+          "questionId": "d78effdf-88ab-4667-813-3bfb2baa0a24",
           "question": "The _____________ festival _____________ artists from diverse backgrounds, _____________ cultural exchange and _____________ a platform for emerging talents to showcase their work.",
           "questionType": "text",
           "answerType": "options",
@@ -99,150 +100,238 @@ const questionData = {
     }
   };
 
-  export default function Quize3() {
-    // Rename to questionRef for clarity
-    const questionRef = useRef(questionData.data.questions[0]);
-    const [index, setIndex] = useState(0);
-    const [answers, setAnswers] = useState([]);
-    const [selectedOptions, setSelectedOptions] = useState([]);
-    const [timeLeft, setTimeLeft] = useState(3);
-    const [total,setTotal]= useState(0);
-    const [flag,setFlag]= useState(0);
-    // Update the current question whenever index changes
-    useEffect(() => {
-      questionRef.current = questionData.data.questions[index];
-      // Reset answers, selected options, and the timer for the new question
-      setAnswers([]);
-      setSelectedOptions([]);
-      setTimeLeft(3);
-    }, [index]);
+  export default function Quize() {
+  const questionRef = useRef(questionData.data.questions[0]);
+  const [index, setIndex] = useState(0);
+  const [answers, setAnswers] = useState([]);
+  const [selectedOptions, setSelectedOptions] = useState([]); 
+  const [selectedArray, setSelectedArray] = useState([]);
+  const [sum,setSum]=useState(0);
   
-    // Timer effect
-    useEffect(() => {
-      if (timeLeft > 0) {
-        const timer = setTimeout(() => setTimeLeft(timeLeft - 1), 1000);
-        return () => clearTimeout(timer);
+
+
+  const [timeLeft, setTimeLeft] = useState(10);
+  const [total, setTotal] = useState(0);
+  const [flag, setFlag] = useState(0);
+
+  useEffect(() => {
+    questionRef.current = questionData.data.questions[index];
+    setAnswers(Array(questionRef.current.correctAnswer.length).fill(null));
+    setSelectedOptions([]);
+    setTimeLeft(10); // Reset the timer to 3 seconds for the new question
+  }, [index]);
+  
+  useEffect(() => {
+    if (timeLeft > 0) {
+      const timer = setTimeout(() => setTimeLeft((prevTime) => prevTime - 1), 1000); // Use the previous state for safety
+      return () => clearTimeout(timer); // Cleanup the timer on each render
+    } else {
+      checkAnswers();
+      console.log(`index is ${index} and length is ${questionData.data.questions.length - 1}`);
+      
+      if (index < questionData.data.questions.length - 1) {
+        setIndex((prevIndex) => prevIndex + 1); // Go to the next question
       } else {
-        // When time runs out, check the answer then move on to next question
-        checkAnswers();  // implement your own logic here
-        // Only advance if there are more questions
-        if (index < questionData.data.questions.length - 1) {
-          setIndex((prevIndex) => prevIndex + 1);
-        } else {
-          // Optionally, show results or finish the test if it's the last question.
-          setFlag(1)
-        }
+        console.log("flag");
+        setFlag(1); // Set flag to indicate the end of the quiz
       }
-    }, [timeLeft, index]);
+    }
+  }, [timeLeft]);
   
-    // Update the answers when an option is selected
-    const handleOptionClick = (option) => {
-      // Ensure that we only select an option if needed and not already selected.
-      if (answers.length < questionRef.current.correctAnswer.length && !selectedOptions.includes(option)) {
-        setAnswers([...answers, option]);
-        setSelectedOptions([...selectedOptions, option]);
-      }
-    };
+
+  const handleOptionClick = (option, index) => {
+    // Fill first empty blank
+    const blankIndex = answers.findIndex((ans) => !ans);
+    if (blankIndex !== -1) {
+      const newAnswers = [...answers];
+      newAnswers[blankIndex] = option;
+      setAnswers(newAnswers);
+      setSelectedOptions([...selectedOptions, option]); // track selected
+    }
+  };
   
-    // Render the question with blanks by splitting using the placeholder.
-    const renderQuestionWithBlanks = () => {
-        const parts = questionRef.current.question.split('___________');
-      
-        return parts.map((part, i) => (
-          <span key={i} className="text-lg">
-            {part}
-            {i < questionRef.current.correctAnswer.length && (
-              <span className="relative inline-block min-w-[100px] mx-1">
-                {/* If there's an answer selected */}
-                {answers[i] ? (
-                  <button 
-                    onClick={() => alert("worling")}
-                    className="px-3 py-1 text-center border-b-2 border-black bg-gray-400"
-                  
-                  >
-                    {answers[i]}
-                  </button>
-                ) : (
-                  // If no answer is selected, show a default "blank" button
-                  <button
-                    onClick={() => handleAnswerChange(i)}
-                    className="px-3 py-1 text-center border-b-2 border-black text-gray-400"
-                    style={{
-                      textDecoration: 'underline dotted',
-                      textUnderlineOffset: '3px',
-                    }}
-                  >
-                    {'__________'}
-                  </button>
-                )}
-              </span>
+
+  const handleBlankClick = (index) => {
+    const newAnswers = [...answers];
+    const removed = newAnswers[index];
+    newAnswers[index] = null;
+    setAnswers(newAnswers);
+    setSelectedOptions(selectedOptions.filter((opt) => opt !== removed)); // remove from selected
+  };
+  
+
+  const renderQuestionWithBlanks = () => {
+    const parts = questionRef.current.question.split('_____________');
+    return parts.map((part, i) => (
+      <span key={i} className="text-lg">
+        {part}
+        {i < questionRef.current.correctAnswer.length && (
+          <span className="inline-flex flex-col items-center min-w-[100px] mx-1">
+            {answers[i] ? (
+              <button
+                onClick={() => handleBlankClick(i)}
+                className="bg-grey-500, border"
+              >
+                {answers[i]} 
+              </button>
+            ) : (
+              <button
+                className="px-3 py-1 text-center text-gray-400"
+                style={{
+                  textDecoration: 'underline dotted',
+                  textUnderlineOffset: '3px',
+                }}
+              >
+                {'__________'}
+              </button>
             )}
+         
+            <div className="w-full h-[1px] bg-black mt-1" />
           </span>
-        ));
-      };
-    // Example checkAnswers function (compare user answers with correct answers)
-    const checkAnswers = () => {
-      const isCorrect = answers.length === questionRef.current.correctAnswer.length &&
-        answers.every((ans, i) => ans === questionRef.current.correctAnswer[i]);
-      (isCorrect ? setTotal((tot)=>tot+1)  : console.log(`not correct marks is${total}`) );
-      console.log(`total marks is${total}`);
-      
-    };
+        )}
+      </span>
+    ));
+  };
+  
+  
+
+  const checkAnswers = () => {
+    setSelectedArray(prevArray => [...prevArray,[ answers]]);
+
+    console.log(`araris::${selectedArray[0]}`);
+    
+    const isCorrect =
+      answers.length === questionRef.current.correctAnswer.length &&
+      answers.every((ans, i) => ans === questionRef.current.options[i]);
+
+    if (isCorrect) {
+      setTotal((tot) => tot + 1);
+    } else {
+      console.log(`Incorrect. Current score: ${total}`);
+    }
+  };
+
+
+
+
+  function completeSentence(ques, userAnswers, setSum) {
+    const parts = ques.question.split('_____________');
+  
+    // Construct the correct sentence
+    const correctSentence = parts.reduce((acc, part, i) => {
+      acc += part;
+      if (i < ques.correctAnswer.length) {
+        acc += <strong>{ques.correctAnswer[i]}</strong>;
+      }
+      return acc;
+    }, []);
+  
+    // Construct the user's sentence
+    const userSentence = parts.reduce((acc, part, i) => {
+      acc += part;
+      if (i < userAnswers.length) {
+        acc += <strong>{userAnswers[i]}</strong>;
+      }
+      return acc;
+    }, []);
+  
+    // Update score if user's sentence is correct
+    const fullCorrectText = parts.reduce((acc, part, i) => {
+      acc += part;
+      if (i < ques.correctAnswer.length) {
+        acc += ques.correctAnswer[i];
+      }
+      return acc;
+    }, '');
+  
+    const fullUserText = parts.reduce((acc, part, i) => {
+      acc += part;
+      if (i < userAnswers.length) {
+        acc += userAnswers[i];
+      }
+      return acc;
+    }, '');
+  
+    if (fullCorrectText === fullUserText) {
+      setSum((prev) => prev + 1);
+    }
   
     return (
-        <div>
-         {flag==0 ? (<div className="w-full h-screen flex flex-col justify-center items-center bg-white p-4">
-        {/* Timer and Quit */}
-        <div className="flex justify-between items-center w-full max-w-3xl mb-4">
-          <div className="text-xl font-semibold">0:{timeLeft.toString().padStart(2, '0')}</div>
-          <button className="text-sm text-gray-600 border px-3 py-1 rounded hover:bg-gray-100">
-            Quit
-          </button>
-        </div>
-  
-        {/* Progress bar */}
-        <div className="w-full max-w-3xl h-2 bg-gray-200 rounded mb-6 overflow-hidden">
-          <div
-            className="h-full bg-yellow-400 transition-all duration-1000"
-            style={{ width: `${((15 - timeLeft) / 15) * 100}%` }}
-          ></div>
-        </div>
-  
-        {/* Question box */}
-        <div className="border-2 border-dashed border-blue-400 p-6 rounded-xl w-full max-w-3xl text-center">
-          <h2 className="mb-4 text-lg font-medium">Select the missing words in the correct order</h2>
-          <div className="text-lg leading-8">{renderQuestionWithBlanks()}</div>
-        </div>
-  
-        {/* Options */}
-        <div className="mt-6 grid grid-cols-2 gap-4 max-w-sm">
-          {/* Use the current question's options */}
-          {questionRef.current.options.map((opt, idx) => (
-            <button
-              key={idx}
-              className={`border rounded-full px-4 py-2 text-base hover:bg-blue-100 ${
-                selectedOptions.includes(opt) ? 'bg-gray-300 cursor-not-allowed' : ''
-              }`}
-              onClick={() => handleOptionClick(opt)}
-              disabled={selectedOptions.includes(opt)}
-            >
-              {opt}
-            </button>
-          ))}
-        </div>
-  
-        {/* Submit Button */}
-        {answers.length === questionRef.current.correctAnswer.length && (
-          <button
-            className="mt-6 bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
-            onClick={checkAnswers}
-          >
-            Submit
-          </button>
-        )}
-      </div>): <h1>test completed</h1>}
-        
-      
+      <div key={ques.questionId} className="mb-6 border p-3 rounded">
+        <p><strong>Correct:</strong> {correctSentence}</p>
+        <p><strong>Your Answer:</strong> {userSentence}</p>
       </div>
     );
   }
+  
+  
+
+  return (
+    <div>
+      {flag === 0 ? (
+        <div className="w-full h-screen flex flex-col justify-center items-center bg-white p-4">
+          <div className="flex justify-between items-center w-full max-w-3xl mb-4">
+            <div className="text-xl font-semibold">0:{timeLeft.toString().padStart(2, '0')}</div>
+            <button className="text-sm text-gray-600 border px-3 py-1 rounded hover:bg-gray-100">
+              Quit
+            </button>
+          </div>
+
+          <div className="w-full max-w-3xl h-2 bg-gray-200 rounded mb-6 overflow-hidden">
+            <div
+              className="h-full bg-yellow-400 transition-all duration-1000"
+              style={{ width: `${((3 - timeLeft) / 3) * 100}%` }}
+            ></div>
+          </div>
+
+          <div className="border-2 border-dashed border-blue-400 p-6 rounded-xl w-full max-w-3xl text-center">
+  <h2 className="mb-4 text-lg font-medium">Select the missing words in the correct order</h2>
+  <div className="text-lg leading-8">{renderQuestionWithBlanks()}</div>
+</div>
+
+{/* Render the options */}
+<div className="flex flex-wrap gap-2 mt-4">
+  {questionRef.current.options.map((option, i) => {
+    // Check if the option is already selected
+    const isSelected = selectedOptions.includes(option);
+    return !isSelected ? (
+      <button
+        key={i}
+        onClick={() => handleOptionClick(option, i)}
+        className="bg-grey-500, border"
+      >
+        {option}
+      </button>
+    ) : null;
+  })}
+</div>
+{index + 1 < questionData.data.questions.length-1 ? (
+  <button onClick={() => setFlag(1)}  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-700">
+    NEXT
+  </button>
+) : (
+  console.log('Button is not displayed yet')
+)}
+
+
+
+
+         
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center min-h-screen text-center">
+           {/* <CircularScore score={total} />
+             */}
+
+          <p className="text-xl">Your score: {total} / {questionData.data.questions.length}</p>
+          {questionData.data.questions.map((ques, ind) =>
+          completeSentence(ques, selectedArray[ind] || [])
+          )}
+
+          
+          
+        </div>
+      )}
+    </div>
+  );
+}

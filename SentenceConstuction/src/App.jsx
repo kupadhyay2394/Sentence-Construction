@@ -1,20 +1,18 @@
-import { useState } from 'react'
-
-import './App.css'
-import Banner from './Components/Banner'
-import Assigmenticon from './Components/Assigment'
-import Home from './Components/Home'
-import Quize from './Components/Quiz'
+import React from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Home from "./Components/Home"
+import Quize from "./Components/Quiz"
 
 
 function App() {
-  const [count, setCount] = useState(0)
-
   return (
-    <>
-    <Quize></Quize>
-    </>
-  )
+    <Router>
+      <Routes>
+        <Route path="/" element={<Home></Home>} />
+        <Route path="/quize" element={<Quize />} />
+      </Routes>
+    </Router>
+  );
 }
 
-export default App
+export default App;
