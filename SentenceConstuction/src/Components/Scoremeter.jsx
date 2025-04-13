@@ -5,7 +5,7 @@ const CircularScore = ({ score }) => {
   const stroke = 8;
   const normalizedRadius = radius - stroke / 2;
   const circumference = normalizedRadius * 2 * Math.PI;
-  const strokeDashoffset = circumference - (score / 100) * circumference;
+  const strokeDashoffset = circumference - (score/10) * circumference;
 
   return (
     <div className="relative w-[90px] h-[90px]">
