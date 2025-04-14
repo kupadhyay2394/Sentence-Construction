@@ -220,12 +220,12 @@ export default function Quiz() {
    <div className='py-4'>
     <div className='flex justify-between'><p className='border w-fit rounded-xl bg-gray-100'>Prompt</p>
     <p>{qIndex+1}/10</p></div>
-   <p className="text-green-600 mt-2">Correct: {correctSentence}</p></div>
+   <p className=" mt-2">Correct: {correctSentence}</p></div>
    <div className='py-4'><p>
     Your response: {isCorrect ? (
-      <span className='text-green-600'>Correct</span>
+      <span className='text-green-600 bg-green-100'>Correct</span>
     ) : (
-      <span className='text-red-600'>Wrong</span>
+      <span className='text-red-600 bg-red-100' >Wrong</span>
     )}
   </p>
   <p>Your Answer: {userSentence}</p></div>
@@ -256,7 +256,7 @@ export default function Quiz() {
 
   return (
     <div className='flex justify-around'>
-    <div className="flex flex-col justify-center items-center p-4 mx-auto mt-10 rounded-md fixed shadow-lg h-[400px]">
+    <div className="flex flex-col justify-center items-center p-4 mx-auto mt-10 rounded-md fixed shadow-lg h-[500px]">
       <div className="flex justify-between items-center w-full max-w-3xl mb-6  ">
         <div className="text-xl font-semibold">
           Time: 0:{timeLeft.toString().padStart(2, '0')}
@@ -304,7 +304,7 @@ export default function Quiz() {
 
 
 
-{index === questionData.data.questions.length - 1 && <button className='bg-[rgba(69,63,225,1)] text-white rounded' onClick={handleShowResults}>&#10230;</button>}
+{index === questionData.data.questions.length - 1 && <button className='bg-[rgba(69,63,225,1)] text-white rounded font-bold ml-10' onClick={handleShowResults}>&#10230;</button>}
 
 
       
