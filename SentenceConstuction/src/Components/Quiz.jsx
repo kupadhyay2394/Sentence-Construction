@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useRef } from 'react';
 import CircularScore from './Scoremeter';
+import { useNavigate } from 'react-router-dom';
 
 const questionData = {
   "status": "SUCCESS",
@@ -102,7 +103,7 @@ export default function Quiz() {
   const [showResults, setShowResults] = useState(false);
 
   const currentQuestion = questionData.data.questions[index];
-
+  const navigate= useNavigate();
 
   useEffect(() => {
     setAnswers(Array(currentQuestion.correctAnswer.length).fill(null));
@@ -169,20 +170,20 @@ export default function Quiz() {
   const renderQuestionWithBlanks = () => {
     const parts = currentQuestion.question.split('_____________');
     return parts.map((part, i) => (
-      <span key={i} className="text-lg">
+      <span key={i} >
         {part}
         {i < currentQuestion.correctAnswer.length && (
           <span className="inline-flex flex-col items-center min-w-[100px] mx-1">
             {answers[i] ? (
               <button 
                 onClick={() => handleBlankClick(i)} 
-                className="px-3 py-1 border border-gray-300 rounded bg-gray-100 hover:bg-gray-200"
+                className="-[38px] rounded-[8px] border border-gray-300 px-[12px] py-[8px] text-sm whitespace-nowrap overflow-hidden text-ellipsis flex items-center justify-center"
               >
                 {answers[i]}
               </button>
             ) : (
               <button 
-                className="px-3 py-1 text-center text-white " 
+                className="w-[78px] h-[38px] text-sm whitespace-nowrap overflow-hidden text-ellipsis flex items-center justify-center text-white" 
               
               >
                 {'__________'}
@@ -214,18 +215,23 @@ export default function Quiz() {
                            userAnswers.every((ans, i) => ans === question.correctAnswer[i]);
 
           return (
-            <div key={question.questionId} className="mb-6 border p-4 rounded-lg">
-              <p className="font-semibold">Question {qIndex + 1}</p>
-              <p className="text-green-600 mt-2">Correct: {correctSentence}</p>
-              <p className={isCorrect ? "text-green-600" : "text-red-600"}>
-                Your Answer: {userSentence}
-              </p>
-              {!isCorrect && userAnswers.length > 0 && (
-                <p className="text-gray-600 mt-1">
-                  Correct order: {question.correctAnswer.join(', ')}
-                </p>
-              )}
-            </div>
+            <div key={question.questionId} className="mb-6  p-4 rounded-lg text-left shadow-md bg-white ;
+ ">
+   <div className='py-4'>
+    <div className='flex justify-between'><p className='border w-fit rounded-xl bg-gray-100'>Prompt</p>
+    <p>{qIndex+1}/10</p></div>
+   <p className="text-green-600 mt-2">Correct: {correctSentence}</p></div>
+   <div className='py-4'><p>
+    Your response: {isCorrect ? (
+      <span className='text-green-600'>Correct</span>
+    ) : (
+      <span className='text-red-600'>Wrong</span>
+    )}
+  </p>
+  <p>Your Answer: {userSentence}</p></div>
+  
+  
+</div>
           );
         })}
       </div>
@@ -234,13 +240,15 @@ export default function Quiz() {
 
   if (showResults) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen p-4">
-        <CircularScore score={score} total={questionData.data.questions.length} />
-        <p className="text-xl mb-8 mt-4">
-          Your score: {score} / {questionData.data.questions.length}
-        </p>
-        {renderResults()}
-      </div>
+      <div className='flex justify-cender gap-4'><div className="flex flex-col mx-100 items-center  justify-center w-743px p-4 text-center border">
+      <CircularScore score={score} total={questionData.data.questions.length} />
+      <p className="text-xl mb-8 mt-4  ">
+        While you correctly formed several sentences, there are a couple of areas where improvement is needed. Pay close attention to sentence structure and word placement to ensure clarity and correctness. Review your responses below for more details.
+      </p>
+      {renderResults()}
+    </div></div>
+      
+    
     );
   }
 
@@ -248,18 +256,28 @@ export default function Quiz() {
 
   return (
     <div className='flex justify-around'>
-    <div className="  flex flex-col justify-center  items-center  p-4 mx-auto my-auto rounded-md   shadow-lg">
-      <div className="flex justify-between items-center w-full max-w-3xl mb-6 ">
+    <div className="flex flex-col justify-center items-center p-4 mx-auto mt-10 rounded-md fixed shadow-lg h-[400px]">
+      <div className="flex justify-between items-center w-full max-w-3xl mb-6  ">
         <div className="text-xl font-semibold">
           Time: 0:{timeLeft.toString().padStart(2, '0')}
         </div>
        
-        <button className="text-sm text-gray-600 border px-3 py-1 rounded hover:bg-gray-100">
+        <button onClick={()=>navigate('/')} className="text-sm text-gray-600 border px-3 py-1 rounded hover:bg-gray-100">
           Quit
         </button>
       </div>
+      <div className="flex gap-2 mt-4 justify-center ">
+      {[...Array(10)].map((_, i) => (
+    <div
+      key={i}
+      className={`h-1 w-10 rounded-full ${
+        i <= index ? 'bg-orange-400' : 'bg-gray-200'
+      }`}
+    />
+  ))}
+      </div>
 
-      <div className="  p-6 rounded-xl w-full max-w-3xl text-center mb-8">
+      <div className="  p-6 rounded-xl w-full max-w-3xl text-center mb-8 ">
         <h2 className="mb-4 text-lg font-medium">
           Select the missing words in the correct order
         </h2>
@@ -268,24 +286,28 @@ export default function Quiz() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-3 mt-4 justify-center mb-8">
-        {currentQuestion.options.map((option, i) => {
-          const isSelected = selectedOptions.includes(option);
-          return !isSelected ? (
-            <button
-              key={i}
-              onClick={() => handleOptionClick(option)}
-              className="px-4 py-2 border border-gray-300 rounded-lg hover:bg-gray-100 transition-colors"
-            >
-              {option}
-            </button>
-          ) : null;
-        })}
+      <div className="grid grid-cols-4 gap-3 mt-4 mb-8 justify-items-center ">
+  {currentQuestion.options.map((option, i) => {
+    const isSelected = selectedOptions.includes(option);
+    return !isSelected ? (
+      <button
+        key={i}
+        onClick={() => handleOptionClick(option)}
+        className=" h-[38px] rounded-[8px] border border-gray-300 px-[12px] py-[8px] text-sm whitespace-nowrap overflow-hidden text-ellipsis flex items-center justify-center"
+      >
+        {option}
+      </button>
+    ) : null;
+  })}
+</div>
 
-{index === questionData.data.questions.length - 1 && <button onClick={handleShowResults}>NEXT</button>}
 
 
-      </div>
+
+{index === questionData.data.questions.length - 1 && <button className='bg-[rgba(69,63,225,1)] text-white rounded' onClick={handleShowResults}>&#10230;</button>}
+
+
+      
 
       
        
