@@ -240,23 +240,29 @@ export default function Quiz() {
 
   if (showResults) {
     return (
-      <div className='flex justify-cender gap-4'><div className="flex flex-col mx-100 items-center  justify-center w-743px p-4 text-center border">
+      <div className='flex justify-center gap-4'>
+       
+        <div className="flex flex-col  items-center  justify-center  p-4 text-center border">
       <CircularScore score={score} total={questionData.data.questions.length} />
-      <p className="text-xl mb-8 mt-4  ">
+      <p className="text-xl  ">
         While you correctly formed several sentences, there are a couple of areas where improvement is needed. Pay close attention to sentence structure and word placement to ensure clarity and correctness. Review your responses below for more details.
       </p>
       {renderResults()}
-    </div></div>
+    </div>
+        </div>
+      
       
     
     );
   }
+  const allBlanksFilled = answers.every(answer => answer !== null);
+  const noOptionsLeft = currentQuestion.options.length === selectedOptions.length;
 
 
 
   return (
     <div className='flex justify-around'>
-    <div className="flex flex-col justify-center items-center p-4 mx-auto mt-10 rounded-md fixed shadow-lg h-[500px]">
+    <div className="flex flex-col justify-between items-center p-4 mx-auto mt-10 rounded-md shadow-lg min-h-screen w-full max-w-4xl">
       <div className="flex justify-between items-center w-full max-w-3xl mb-6  ">
         <div className="text-xl font-semibold">
           Time: 0:{timeLeft.toString().padStart(2, '0')}
@@ -304,8 +310,14 @@ export default function Quiz() {
 
 
 
-{index === questionData.data.questions.length - 1 && <button className='bg-[rgba(69,63,225,1)] text-white rounded font-bold ml-10' onClick={handleShowResults}>&#10230;</button>}
-
+{(allBlanksFilled || noOptionsLeft) && (
+          <button 
+            onClick={handleQuestionTransition}
+            className="bg-[rgba(69,63,225,1)] text-white rounded font-bold px-4 py-2"
+          >
+            {index === questionData.data.questions.length - 1 ? 'Finish' : 'Next'}
+          </button>
+        )}
 
       
 
