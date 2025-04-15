@@ -15,6 +15,35 @@ Check out the live demo deployed on Vercel:
 - 📦 **ESLint** with React Hooks and Refresh Plugins
 - 🔍 **React Router DOM** 7
 
+## 📁 Folder Structure
+
+Markdown
+
+## 📁 Folder Structure
+
+.
+- **├── public/**        ## Public assets
+- **├── src/**           ## Source files
+- **│   ├── Component**
+- **│   │    ├── Home.jsx**
+- **│   │    ├── Quize.jsx**
+- **│   │    └── Scoremeter.jsx**             
+- **│   ├── main.jsx**    # Entry point
+- **│   └── App.jsx**         # Your components/pages
+- **├── index.html**      # Main HTML file
+- **├── package.json**    # Project config and dependencies
+- **├── vite.config.js**  # Vite configuration
+- **├── eslint.config.js** # ESLint configuration
+- **├── tailwind.config.js** # Tailwind configuration (if added)
+- **└── README.md**       # Project documentation
+
+
+Note: The structure represents a typical Vite + React project with:
+- Public assets in `public/`
+- Source code in `src/` with main.jsx as entry point
+- Configuration files for Vite, ESLint, and Tailwind CSS
+- Standard project metadata files (package.json and README.md)
+
 
 ## 🔧 Available Scripts
 
